@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import './styles.css';
 import { appConfig, getReturnUrl } from './config/appConfig.ts';
 import { conversations, puzzleQuestion, returnInstruction, synthesisInstruction, type Conversation } from './config/conversations.ts';
@@ -14,7 +13,9 @@ const returnLink = document.querySelector<HTMLAnchorElement>('#return-link')!;
 const motionToggle = document.querySelector<HTMLButtonElement>('#motion-toggle')!;
 
 const viewed = new Set<string>();
-let reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+let reduceMotion = motionPreference.matches;
+let refreshDreamMotion: (() => void) | undefined;
 
 function renderConversationList(): void {
   conversationList.innerHTML = conversations.map((conversation) => `
@@ -105,18 +106,25 @@ function setMotionPreference(nextValue: boolean): void {
   document.body.classList.toggle('reduce-motion', reduceMotion);
   motionToggle.setAttribute('aria-pressed', String(reduceMotion));
   motionToggle.textContent = reduceMotion ? appConfig.restoreMotionLabel : appConfig.reduceMotionLabel;
+  refreshDreamMotion?.();
 }
 
-function setupDreamCanvas(): void {
+async function setupDreamCanvas(): Promise<void> {
   const canvas = document.querySelector<HTMLCanvasElement>('#dream-canvas')!;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const context = canvas.getContext('webgl2', { antialias: true, alpha: true });
+  if (!context) return;
+  const {
+    WebGLRenderer, Scene, OrthographicCamera, BufferGeometry, Color, BufferAttribute,
+    PointsMaterial, Points, Mesh, CircleGeometry, MeshBasicMaterial,
+  } = await import('three');
+  const renderer = new WebGLRenderer({ canvas, context, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 10);
+  const scene = new Scene();
+  const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 10);
   camera.position.z = 2;
 
-  const geometry = new THREE.BufferGeometry();
+  const geometry = new BufferGeometry();
   const stars = 180;
   const positions = new Float32Array(stars * 3);
   const colors = new Float32Array(stars * 3);
@@ -124,40 +132,55 @@ function setupDreamCanvas(): void {
     positions[index * 3] = (Math.random() - 0.5) * 2.4;
     positions[index * 3 + 1] = (Math.random() - 0.5) * 2.4;
     positions[index * 3 + 2] = 0;
-    const color = new THREE.Color().setHSL(0.68 + Math.random() * 0.1, 0.55, 0.55 + Math.random() * 0.25);
+    const color = new Color().setHSL(0.055 + Math.random() * 0.09, 0.63, 0.62 + Math.random() * 0.2);
     colors[index * 3] = color.r;
     colors[index * 3 + 1] = color.g;
     colors[index * 3 + 2] = color.b;
   }
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  const material = new THREE.PointsMaterial({ size: 0.009, vertexColors: true, transparent: true, opacity: 0.7 });
-  const points = new THREE.Points(geometry, material);
+  geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new BufferAttribute(colors, 3));
+  const material = new PointsMaterial({ size: 0.009, vertexColors: true, transparent: true, opacity: 0.7 });
+  const points = new Points(geometry, material);
   scene.add(points);
 
-  const glow = new THREE.Mesh(new THREE.CircleGeometry(0.62, 64), new THREE.MeshBasicMaterial({ color: 0x5d5ad5, transparent: true, opacity: 0.08 }));
+  const glow = new Mesh(new CircleGeometry(0.62, 64), new MeshBasicMaterial({ color: 0xe6a271, transparent: true, opacity: 0.08 }));
   glow.position.set(0.62, 0.2, -0.1);
   scene.add(glow);
 
-  const clock = new THREE.Clock();
-  const resize = () => renderer.setSize(window.innerWidth, window.innerHeight);
-  window.addEventListener('resize', resize);
-  const animate = () => {
-    const elapsed = clock.getElapsedTime();
-    if (!reduceMotion) {
-      points.rotation.z = elapsed * 0.008;
-      glow.scale.setScalar(1 + Math.sin(elapsed * 0.35) * 0.035);
-    }
+  const animate = (time: number) => {
+    const elapsed = time / 1000;
+    points.rotation.z = elapsed * 0.008;
+    glow.scale.setScalar(1 + Math.sin(elapsed * 0.35) * 0.035);
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);
   };
-  animate();
+  const updateMotion = () => {
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(reduceMotion ? null : animate);
+  };
+  updateMotion();
+  refreshDreamMotion = updateMotion;
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+  });
+  canvas.classList.remove('is-hidden');
 }
 
 renderConversationList();
 configureReturnLink();
 setMotionPreference(reduceMotion);
-setupDreamCanvas();
 openMailboxButton.addEventListener('click', openMailbox);
 synthesisButton.addEventListener('click', showSynthesis);
 motionToggle.addEventListener('click', () => setMotionPreference(!reduceMotion));
+motionPreference.addEventListener('change', (event) => setMotionPreference(event.matches));
+conversationContent.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element) || !event.target.closest('[data-back-to-list]')) return;
+  const selected = conversationList.querySelector<HTMLButtonElement>('.is-selected');
+  selected?.classList.remove('is-selected');
+  conversationContent.classList.add('is-hidden');
+  emptyState.classList.remove('is-hidden');
+  (selected ?? synthesisButton).focus();
+});
+void setupDreamCanvas().catch((error: unknown) => {
+  console.warn('Décor Three.js indisponible. Le fond CSS est utilisé.', error);
+});

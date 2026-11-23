@@ -5,9 +5,10 @@
 - Build TypeScript et Vite réussi avec `npm run build`. Prévisualisation sous `/EscapeStress/`.
 - Vérifié dans Edge à 1280 et 390 px : ouverture de la messagerie, consultation au clavier des trois conversations et du brouillon, et passage à « Consulté ». Sur ordinateur, la synthèse affiche la question et la consigne de report.
 - Préférence de mouvement réduit prise en compte. Lien de retour masqué sans paramètre et affiché avec `?returnUrl=%2Fsalle-2`.
-- [ ] Afficher la consigne de synthèse sur mobile. Le bouton est masqué sous le seuil de 760 px.
-- [ ] Rendre le bouton « Tous les échanges » fonctionnel et ramener le focus à la liste.
-- [ ] Permettre l’ouverture de la messagerie sans WebGL. L’erreur d’initialisation du décor bloque actuellement les interactions.
+- [x] Harmoniser le fragment avec les illustrations de Mélissa et les indices du jeu principal. Ajouter des animations d’ouverture et de lecture compatibles avec le mouvement réduit.
+- [x] Afficher la consigne de synthèse sur mobile. Vérifié dans Edge à 320 et 390 px.
+- [x] Rendre le bouton « Tous les échanges » fonctionnel et ramener le focus au bouton d’origine.
+- [x] Garder la messagerie fonctionnelle avec le fond CSS si WebGL est désactivé, si le renderer échoue ou si Three.js ne se charge pas. Vérifié dans Edge sur les trois conversations, le brouillon et la synthèse.
 - [ ] Ajouter le débriefing prévu ci-dessous.
 - [x] Préparer le workflow GitHub Pages.
 - [x] Publier sur [GitHub Pages](https://colibriou.github.io/EscapeStress/) et vérifier dans Edge l’ouverture de la messagerie, la lecture d’un échange et l’affichage de la synthèse sur ordinateur.
@@ -108,7 +109,7 @@ Prévoir une réponse libre ou quelques exemples de ressources : proche, collèg
 - [ ] Le feedback explique pourquoi le soutien est une ressource.
 - [ ] Le joueur sait quand il a obtenu l’information nécessaire.
 - [ ] Le lien de retour vers le jeu principal fonctionne, si prévu dans l’intégration.
-- [ ] L’interface reste utilisable sur différentes tailles d’écran.
+- [x] L’interface reste utilisable sur différentes tailles d’écran. Vérifié à 320, 390 et 1280 px.
 - [x] Les animations peuvent être réduites ou désactivées si nécessaire.
 
 ## Livrables
