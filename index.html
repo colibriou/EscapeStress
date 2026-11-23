@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c102a" />
+    <title>Fragment de rêve 2 — EscapeStress</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="dream-canvas" aria-hidden="true"></canvas>
+      <main class="experience-shell" aria-labelledby="page-title">
+        <section id="intro-screen" class="intro-screen" aria-labelledby="page-title">
+          <p class="eyebrow">ESCAPESTRESS · SALLE 2</p>
+          <h1 id="page-title">Fragment de rêve 2</h1>
+          <p class="intro-copy">Dans son rêve, Mélissa retrouve sa messagerie de travail. Elle a le sentiment de devoir tout gérer seule. Plusieurs échanges sont restés sans suite…</p>
+          <button id="open-mailbox" class="primary-button" type="button">Ouvrir la messagerie</button>
+        </section>
+
+        <section id="mailbox-screen" class="mailbox-window is-hidden" aria-label="Messagerie de travail de Mélissa">
+          <header class="window-header">
+            <div class="window-title">
+              <span class="window-mark" aria-hidden="true">✦</span>
+              <div>
+                <p class="window-kicker">ARCHIVES DE TRAVAIL</p>
+                <h2>Messagerie</h2>
+              </div>
+            </div>
+            <div class="window-meta">
+              <span class="dream-label">Fragment de rêve 2</span>
+              <button id="motion-toggle" class="quiet-button" type="button" aria-pressed="false">Réduire les effets</button>
+            </div>
+          </header>
+
+          <div class="mailbox-layout">
+            <aside class="conversation-sidebar" aria-label="Éléments de la messagerie">
+              <div class="sidebar-heading">
+                <span>Boîte de réception</span>
+                <span class="count-badge" aria-label="quatre éléments">4</span>
+              </div>
+              <nav id="conversation-list" class="conversation-list" aria-label="Conversations"></nav>
+              <div class="sidebar-divider"></div>
+              <button id="synthesis-button" class="synthesis-button" type="button">
+                <span class="synthesis-icon" aria-hidden="true">⌁</span>
+                <span><strong>Consigne de synthèse</strong><small>Comparer les échanges</small></span>
+              </button>
+            </aside>
+
+            <section class="conversation-pane" aria-live="polite">
+              <div id="conversation-empty" class="conversation-empty">
+                <span class="empty-icon" aria-hidden="true">✉</span>
+                <h3>Choisissez un échange</h3>
+                <p>Les archives de Mélissa sont consultables dans n’importe quel ordre.</p>
+              </div>
+              <div id="conversation-content" class="conversation-content is-hidden"></div>
+            </section>
+          </div>
+
+          <footer class="window-footer">
+            <p><span class="status-dot" aria-hidden="true"></span>Archives fictives · Aucun message ne sera envoyé</p>
+            <a id="return-link" class="return-link is-hidden" href="#">Retourner dans le jeu principal</a>
+          </footer>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
