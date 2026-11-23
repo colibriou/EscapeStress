@@ -1,6 +1,6 @@
 import './styles.css';
 import { appConfig, getReturnUrl } from './config/appConfig.ts';
-import { conversations, puzzleQuestion, returnInstruction, synthesisInstruction, type Conversation } from './config/conversations.ts';
+import { conversations, puzzleQuestion, returnInstruction, synthesisHint, type Conversation } from './config/conversations.ts';
 
 const introScreen = document.querySelector<HTMLElement>('#intro-screen')!;
 const mailboxScreen = document.querySelector<HTMLElement>('#mailbox-screen')!;
@@ -46,7 +46,6 @@ function showConversation(id: string): void {
 }
 
 function conversationMarkup(conversation: Conversation): string {
-  const draftNotice = conversation.kind === 'draft' ? '<p class="draft-notice">Brouillon non envoyé · Archive consultable uniquement</p>' : '';
   return `
     <div class="conversation-toolbar">
       <div>
@@ -56,7 +55,6 @@ function conversationMarkup(conversation: Conversation): string {
       </div>
       <button class="back-button" type="button" data-back-to-list>← Tous les échanges</button>
     </div>
-    ${draftNotice}
     <div class="message-stack" aria-label="Messages de ${conversation.title}">
       ${conversation.messages.map((message) => `
         <article class="message-row ${message.direction}">
@@ -74,16 +72,39 @@ function showSynthesis(): void {
   conversationContent.classList.remove('is-hidden');
   conversationContent.innerHTML = `
     <div class="conversation-toolbar">
-      <div><p class="conversation-type">À garder en tête</p><h3>Consigne de synthèse</h3><p>Une question pour relire les échanges</p></div>
+      <div><p class="conversation-type">À garder en tête</p><h3>Une pensée reste en suspens…</h3><p>Une question pour relire les échanges</p></div>
       <button class="back-button" type="button" data-back-to-list>← Tous les échanges</button>
     </div>
     <section class="question-card" aria-labelledby="puzzle-question">
       <span class="question-mark" aria-hidden="true">?</span>
       <p id="puzzle-question">${puzzleQuestion}</p>
     </section>
-    <p class="synthesis-copy">${synthesisInstruction}</p>
     <p class="return-instruction">${returnInstruction}</p>
+    <div class="hint">
+      <button class="hint-toggle" type="button" aria-expanded="false" aria-controls="synthesis-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18h6m-5 3h4m-5-6c0-2-3-3-3-6a6 6 0 0 1 12 0c0 3-3 4-3 6z" />
+        </svg>
+        Indice
+      </button>
+      <section id="synthesis-hint" class="hint-card" aria-labelledby="hint-title" hidden>
+        <h4 id="hint-title">Un éclairage supplémentaire</h4>
+        <p>${synthesisHint}</p>
+        <button class="hint-close quiet-button" type="button">Fermer</button>
+      </section>
+    </div>
   `;
+  const hintToggle = conversationContent.querySelector<HTMLButtonElement>('.hint-toggle')!;
+  const hint = conversationContent.querySelector<HTMLElement>('#synthesis-hint')!;
+  const setHintExpanded = (expanded: boolean) => {
+    hint.hidden = !expanded;
+    hintToggle.setAttribute('aria-expanded', String(expanded));
+  };
+  hintToggle.addEventListener('click', () => setHintExpanded(hint.hidden));
+  hint.querySelector<HTMLButtonElement>('.hint-close')!.addEventListener('click', () => {
+    setHintExpanded(false);
+    hintToggle.focus();
+  });
   conversationContent.querySelector<HTMLButtonElement>('[data-back-to-list]')?.focus();
 }
 
@@ -97,7 +118,7 @@ function configureReturnLink(): void {
   const returnUrl = getReturnUrl();
   if (returnUrl) {
     returnLink.href = returnUrl;
-    returnLink.classList.remove('is-hidden');
+    returnLink.closest('footer')?.classList.remove('is-hidden');
   }
 }
 

@@ -63,6 +63,6 @@ export const conversations: Conversation[] = [
   },
 ];
 
-export const puzzleQuestion = 'Mélissa cherche une solution seule. Quelle ressource commune à ces trois échanges pourrait-elle mobiliser face à la pression ?';
-export const synthesisInstruction = 'Comparez les propositions de Thomas, Samira et Alex. Qu’ont-elles en commun ? Reportez votre réponse dans le jeu principal.';
+export const puzzleQuestion = 'Mélissa cherche une solution seule. Quelle ressource commune à ces trois échanges pourrait-elle mobiliser pour faire face à cette situation stressante ?';
+export const synthesisHint = 'Comparez les propositions de Thomas, Samira et Alex. Qu’ont-elles en commun ?';
 export const returnInstruction = 'Lorsque vous avez trouvé, revenez dans le jeu principal pour saisir votre réponse.';
