@@ -10,7 +10,8 @@
 - [ ] Permettre l’ouverture de la messagerie sans WebGL. L’erreur d’initialisation du décor bloque actuellement les interactions.
 - [ ] Ajouter le débriefing prévu ci-dessous.
 - [x] Préparer le workflow GitHub Pages.
-- [ ] Vérifier la publication et l’aller-retour avec le jeu principal.
+- [x] Publier sur [GitHub Pages](https://colibriou.github.io/EscapeStress/) et vérifier dans Edge l’ouverture de la messagerie, la lecture d’un échange et l’affichage de la synthèse sur ordinateur.
+- [ ] Tester l’aller-retour avec le lien du jeu principal.
 
 ## Objectif général
 
